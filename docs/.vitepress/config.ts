@@ -4,7 +4,6 @@ import { defineConfig } from 'vitepress'
 export default defineConfig({
   title: "博客",
   description: "my blog",
-  base: "/blog/",
   srcDir: "./src",
   outDir: "../dist",
   themeConfig: {
