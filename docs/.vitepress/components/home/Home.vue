@@ -38,7 +38,7 @@ const onNextPageClick = () => {
   .page-container {
     display: flex;
     justify-content: space-between;
-    width: 60%;
+    width: 70vw;
     margin-top: 1.5rem;
 
     .page-btn {

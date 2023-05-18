@@ -23,6 +23,6 @@ const { blogList } = useBlogHook(props.pagination)
 
 <style lang="scss" scoped>
 .blog-list-container {
-  width: 60%;
+  width: 70vw;
 }
 </style>
