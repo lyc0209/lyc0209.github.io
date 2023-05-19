@@ -10,22 +10,22 @@ const generate = async (dirPath) => {
     const stats = fs.statSync(tempPath);
     if (stats.isDirectory()) {
       generate(tempPath);
-    } else if (path.normalize("./src/index.md") !== tempPath) {
+    } else if (path.normalize("./docs/src/index.md") !== tempPath) {
       const content = fs.readFileSync(tempPath, 'utf8')
       let s = re.exec(content)
       re.lastIndex = 0
       if (s) {
         console.log(s[1], tempPath)
         const result = JSON.parse(s[1])
-        result.link = tempPath.slice(4, -3).replaceAll("\\", "/")
+        result.link = tempPath.slice(8, -3).replaceAll("\\", "/")
         out.push(result)
       }
     }
   })
 }
 
-generate("./src").then(() => {
-  const filePath = './.vitepress/docs.json'
+generate("./docs/src").then(() => {
+  const filePath = './docs/.vitepress/docs.json'
   fs.writeFileSync(
     filePath,
     JSON.stringify(out),
