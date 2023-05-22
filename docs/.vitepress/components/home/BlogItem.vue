@@ -28,8 +28,8 @@ defineProps<{
   padding: 1.5rem;
   cursor: pointer;
   box-shadow: 0 4px 10px rgba(0, 2, 4, 0.06), 0 0 1px rgba(0, 2, 4, 0.11);
-  background: #fff;
-  color: #2f3d4e;
+  background: var(--vp-c-bg);
+  color: var(--vp-c-text-1);
 
 
   .card-title {
