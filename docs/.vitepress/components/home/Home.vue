@@ -1,4 +1,4 @@
-<script setup>
+<script setup lang="ts">
 import { ref } from "vue"
 import BlogList from "./BlogList.vue"
 import {computed} from "vue"
