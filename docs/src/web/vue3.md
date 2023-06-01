@@ -635,3 +635,16 @@ vue
 ```
 
 该选项也可以接收一个对象，该对象允许开发者定义传入事件参数的验证器，和 `props` 定义里的验证器类似。
+
+### 2. Teleport组件
+`<Teleport> `是一个内置组件，它可以将一个组件内部的一部分模板“传送”到该组件的 DOM 结构外层的位置去。
+
+有以下场景：组件模板的一部分在逻辑上属于该组件，但从视图角度来看，它在 DOM 中应该被渲染在整个 Vue 应用外部的其他地方，例如弹窗。
+
+[示例](https://play.vuejs.org/#eNrVU01v2zAM/SusgCEtsMSpgx7iucGGXXYpdim2iy+ORTfCZEuQ5DRZkf8+SrLjrMuGoacWCGKRfPzQe9QT+6T1bNshy1huKyO0A4uu06uiFY1WxsETGKzhALVRDUwIOjmG7vZ3ipcyhgo2S3qHL1iw57D0D1w6AIu2Uq110NgHuPX9LidfUEoF35WR/GJyVbR5Esejwchw2GhZOiQLIOdiC5Usrb0tmOocmoKFAIU2i9W9UtIJbeFRuA186xAWcI8S/Wx5QoAeSlX6IxnD1ZIhmozhfG1G/7ms9EzacMqT4+zsPTshbFSAULgLzHGsy06SBr4CL115eRXPQCS5zrSDBaA0thnUpbQYXQf/oT/6/Yu7deecauFjJUX1w/NHdUgDZ7wyq6/eCiPmSUSGGj3n26mo+5SCHRVoPHxUQK+ilEF8t0EI8Ys88TsW6Tw/QrwLW32WyuJJ+7NchptZt5cItqICnDyz0ClSpJUVTihPkdgh/+B9P6ei5bjLYLlcBodTOoN0/i4YEmuXwU1vPQruNhks5nO9C46mNA+inUbU9Ppm8K+V4WgyuNY7sEoKTkr5dlEGP+CJ7uEBvHLh0+fKD2+H6KK0teL7Uez/3Yq/7kV6shgvWY3fn9ww6hvelcMv4ubajA==)
+
+当在初始 HTML 结构中使用这个组件时，会有一些潜在的问题：
+
+position: fixed 能够相对于浏览器窗口放置有一个条件，那就是不能有任何祖先元素设置了 transform、perspective 或者 filter 样式属性。也就是说如果我们想要用 CSS transform 为祖先节点` <div class="outer">`设置动画，就会不小心破坏模态框的布局！
+
+这个模态框的 z-index 受限于它的容器元素。如果有其他元素与`<div class="outer">`重叠并有更高的 z-index，则它会覆盖住我们的模态框。
