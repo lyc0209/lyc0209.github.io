@@ -142,6 +142,10 @@ onMounted(() => {
 </template>
 ```
 
+生命周期变化：
+![](https://cdn.jsdelivr.net/gh/lyc0209/pic/blog/202306011455696.png)
+![](https://cdn.jsdelivr.net/gh/lyc0209/pic/blog/202306011457001.png)
+
 组合式 API的优势：
 
 1. **更好的逻辑复用**
