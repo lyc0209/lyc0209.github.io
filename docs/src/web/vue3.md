@@ -59,30 +59,6 @@ input.addEventListener('keyup', function(e) {
 - [依赖注入](https://cn.vuejs.org/api/composition-api-dependency-injection.html)：例如 `provide()` 和 `inject()`，使我们可以在使用响应式 API 时，利用 Vue 的依赖注入系统。
 
 ```vue
-// vue3
-<script setup>
-import { ref, onMounted } from 'vue'
-
-// 响应式状态
-const count = ref(0)
-
-// 更改状态、触发更新的函数
-function increment() {
-  count.value++
-}
-
-// 生命周期钩子
-onMounted(() => {
-  console.log(`计数器初始值为 ${count.value}。`)
-})
-</script>
-
-<template>
-  <button @click="increment">点击了：{{ count }} 次</button>
-</template>
-```
-
-```vue
 // vue2
 <template>
   <button @click="increment">点击了：{{ count }} 次</button>
@@ -108,6 +84,62 @@ export default {
   }
 }
 </script>
+```
+
+```vue
+// vue3
+<template>
+  <button @click="increment">点击了：{{ count }} 次</button>
+</template>
+
+<script>
+import { ref, onMounted } from 'vue'
+export default {
+  setup() {
+    // 响应式状态
+    const count = ref(0)
+
+    // 更改状态、触发更新的函数
+    function increment() {
+      count.value++
+    }
+
+    // 生命周期钩子
+    onMounted(() => {
+      console.log(`计数器初始值为 ${count.value}。`)
+    })
+    
+    return {
+      count,
+      increment
+    }
+  }
+}
+</script>
+```
+
+```vue
+// vue3 with script setup
+<script setup>
+import { ref, onMounted } from 'vue'
+
+// 响应式状态
+const count = ref(0)
+
+// 更改状态、触发更新的函数
+function increment() {
+  count.value++
+}
+
+// 生命周期钩子
+onMounted(() => {
+  console.log(`计数器初始值为 ${count.value}。`)
+})
+</script>
+
+<template>
+  <button @click="increment">点击了：{{ count }} 次</button>
+</template>
 ```
 
 组合式 API的优势：
