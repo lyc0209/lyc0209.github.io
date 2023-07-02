@@ -2,7 +2,7 @@ import { defineConfig } from 'vitepress'
 
 // https://vitepress.dev/reference/site-config
 export default defineConfig({
-  title: "博客",
+  title: "Log",
   description: "my blog",
   srcDir: "./src",
   outDir: "../dist",

@@ -24,7 +24,7 @@ Vue2通过hack方式支持了`push()`、`pop()`、`shift()`等方法的响应式
 
 Proxy 用于修改某些操作的默认行为，可以理解成，在目标对象之前架设一层“拦截”，外界对该对象的访问，都必须先通过这层拦截，因此提供了一种机制，可以对外界的访问进行过滤和改写。
 
-[示例](https://codepen.io/xiaomuzhu/pen/KRmwRE/)
+[示例](https://codepen.io/tmyhywcw-the-builder/pen/VwVbOqE)
 
 ```javascript
 const input = document.getElementById('input');
@@ -371,42 +371,6 @@ Vue 本身就是用 TypeScript 编写的，并对 TypeScript 提供了一等公�
    }
    ```
 
-   #### VNode Prop 格式化
-
-   **2.x 语法**
-
-   在 2.x 中，`domProps` 包含 VNode prop 中的嵌套列表：
-
-   ```js
-   // 2.x
-   {
-     staticClass: 'button',
-     class: { 'is-outlined': isOutlined },
-     staticStyle: { color: '#34495E' },
-     style: { backgroundColor: buttonColor },
-     attrs: { id: 'submit' },
-     domProps: { innerHTML: '' },
-     on: { click: submitForm },
-     key: 'submit-button'
-   }
-   ```
-
-   **3.x 语法**
-
-   在 3.x 中，整个 VNode prop 的结构都是扁平的。使用上面的例子，来看看它现在的样子。
-
-   ```js
-   // 3.x 语法
-   {
-     class: ['button', { 'is-outlined': isOutlined }],
-     style: [{ color: '#34495E' }, { backgroundColor: buttonColor }],
-     id: 'submit',
-     innerHTML: '',
-     onClick: submitForm,
-     key: 'submit-button'
-   }
-   ```
-
    #### 注册组件
 
    **2.x 语法**
@@ -672,7 +636,27 @@ vue
 
 该选项也可以接收一个对象，该对象允许开发者定义传入事件参数的验证器，和 `props` 定义里的验证器类似。
 
-### 2. Teleport组件
+### 2. expose选项
+用于声明当组件实例被父组件通过模板引用访问时暴露的公共属性。
+当使用 expose 时，只有显式列出的属性将在组件实例上暴露。
+
+expose 仅影响用户定义的属性——它不会过滤掉内置的组件实例属性。
+```js
+export default {
+  // 只有 `publicMethod` 在公共实例上可用
+  expose: ['publicMethod'],
+  methods: {
+    publicMethod() {
+      // ...
+    },
+    privateMethod() {
+      // ...
+    }
+  }
+}
+```
+
+### 3. Teleport组件
 `<Teleport> `是一个内置组件，它可以将一个组件内部的一部分模板“传送”到该组件的 DOM 结构外层的位置去。
 
 有以下场景：组件模板的一部分在逻辑上属于该组件，但从视图角度来看，它在 DOM 中应该被渲染在整个 Vue 应用外部的其他地方，例如弹窗。
