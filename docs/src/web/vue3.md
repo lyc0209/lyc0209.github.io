@@ -128,7 +128,9 @@ export default {
 </script>
 ```
 
-```vue
+::: code-group
+
+```vue [Counter1.vue]
 // vue3
 <template>
   <button @click="increment">点击了：{{ count }} 次</button>
@@ -160,7 +162,7 @@ export default {
 </script>
 ```
 
-```vue
+```vue [Counter2.vue]
 // vue3 with script setup
 <script setup>
 import { ref, onMounted } from 'vue'
@@ -183,6 +185,10 @@ onMounted(() => {
   <button @click="increment">点击了：{{ count }} 次</button>
 </template>
 ```
+
+:::
+
+
 
 生命周期变化：
 <img src="https://cdn.jsdelivr.net/gh/lyc0209/pic/blog/202306011455696.png" style="zoom: 50%;" />
@@ -222,7 +228,9 @@ onMounted(() => {
    ```
    抽取成组合式函数：
 
-   ```js
+   :::code-group
+
+   ```js [fetch.js]
    // fetch.js
    import { ref } from 'vue'
    
@@ -239,7 +247,7 @@ onMounted(() => {
    }
    ```
 
-   ```vue
+   ```vue [Test.vue]
    <script setup>
    import { useFetch } from './fetch.js'
    
@@ -247,11 +255,15 @@ onMounted(() => {
    </script>
    ```
 
+   :::
+
    
 
    监听鼠标移动
 
-   ```js
+   :::code-group
+
+   ```ts [useMouseHook.ts]
    // useMouseHook
    import { ref, onMounted, onUnmounted } from 'vue';
    
@@ -276,7 +288,7 @@ onMounted(() => {
    }
    ```
 
-   ```vue
+   ```vue [Test.vue]
    <template>
      <div>
        <p>Mouse X: {{ x }}</p>
@@ -289,6 +301,8 @@ onMounted(() => {
    const { x, y } = useMouseHook()
    </script>
    ```
+
+   :::
 
    
 
@@ -333,7 +347,7 @@ Vue 本身就是用 TypeScript 编写的，并对 TypeScript 提供了一等公�
 
    ![](https://cdn.jsdelivr.net/gh/lyc0209/pic/blog/202307111634436.png)
 
-1. 静态提升
+2. 静态提升
 
    指在编译器编译的过程中，将一些静态的节点或属性提升到渲染函数之外。
 
@@ -348,9 +362,9 @@ Vue 本身就是用 TypeScript 编写的，并对 TypeScript 提供了一等公�
       </div>
       ```
 
-      无静态提升：
+      :::code-group
 
-      ```js
+      ```js [无静态提升]
       function render() {
         return (openClock(), createClock('div', null,  [
           createVNode('p', null, 'static text'),
@@ -359,9 +373,7 @@ Vue 本身就是用 TypeScript 编写的，并对 TypeScript 提供了一等公�
       }
       ```
 
-      有静态提升：
-
-      ```vue
+      ```js [有状态提升]
       // 把静态节点提升到渲染函数之外
       const hoist1 = createVNode('p', null, 'text')
       
@@ -372,6 +384,8 @@ Vue 本身就是用 TypeScript 编写的，并对 TypeScript 提供了一等公�
         ]))
       }
       ```
+
+      :::
 
       经过静态提升后，在渲染函数内只会持有对静态节点的引用。当响应式数据发生变化，并使得渲染函数重新执行时，并不会重新创建静态的虚拟节点，从而避免了额外的性能开销。
 
@@ -388,9 +402,9 @@ Vue 本身就是用 TypeScript 编写的，并对 TypeScript 提供了一等公�
       </script>
       ```
 
-      无静态提升：
+      :::code-group
 
-      ```vue
+      ```vue [无静态提升]
       <script>
       import { ref } from 'vue'
       export default {
@@ -402,9 +416,7 @@ Vue 本身就是用 TypeScript 编写的，并对 TypeScript 提供了一等公�
       </script>
       ```
 
-      有静态提升：
-
-      ```vue
+      ```vue [有静态提升]
       <script>
       import { ref } from 'vue'
       const name = "lyc"
@@ -415,6 +427,8 @@ Vue 本身就是用 TypeScript 编写的，并对 TypeScript 提供了一等公�
       }
       </script>
       ```
+      
+      :::
 
 2. 事件缓存（[示例](https://template-explorer.vuejs.org/#eyJzcmMiOiI8YnV0dG9uIEBjbGljaz1cIm9uQ2xpY2tcIj48L2J1dHRvbj4iLCJvcHRpb25zIjp7ImNhY2hlSGFuZGxlcnMiOnRydWV9fQ==)）
 
@@ -452,7 +466,426 @@ Vue 本身就是用 TypeScript 编写的，并对 TypeScript 提供了一等公�
    // Check the console for the AST
    ```
 
+
+
+## 新增概念
+
+### 1. defineProps
+
+setup语法糖中定义props
+
+```vue
+<script setup lang="ts">
+const props = defineProps<{
+  name: string
+  age?: number
+}>()
+</script>
+```
+
+```js
+// 对应的选项式api
+<script>
+export default {
+  props: {
+    name: {
+      type: String,
+      required: true
+    },
+    age: {
+      type: Number
+    }
+  }
+}
+</script>
+```
+
+### 2. withDefaults
+
+结合`defineProps`使用，定义props的默认值
+
+```vue
+<script setup lang="ts">
+const props = withDefaults(defineProps<{
+  name: string
+  age?: number
+}>(), {
+    age: 18
+})
+</script>
+```
+
+
+
+### 3. emits选项(defineEmits)
+
+Vue 3 现在提供一个 `emits` 选项，和现有的 `props` 选项类似。这个选项可以用来定义一个组件可以向其父组件触发的事件。
+
+**2.x 的行为**
+
+在 Vue 2 中，你可以定义一个组件可接收的 prop，但是你无法声明它可以触发哪些事件：
+
+```vue
+<template>
+  <div>
+    <p>{{ text }}</p>
+    <button v-on:click="$emit('accepted')">OK</button>
+  </div>
+</template>
+<script>
+  export default {
+    props: ['text']
+  }
+</script>
+```
+
+**3.x 的行为**
+
+和 prop 类似，现在可以通过 `emits` 选项来定义组件可触发的事件：
+
+```vue
+<template>
+  <div>
+    <p>{{ text }}</p>
+    <button v-on:click="$emit('accepted')">OK</button>
+  </div>
+</template>
+<script>
+  export default {
+    props: ['text'],
+    emits: ['accepted']
+  }
+</script>
+```
+
+```vue
+// 组合式api
+<template>
+  <div>
+    <p>{{ text }}</p>
+    <button v-on:click="emit('accepted')">OK</button>
+  </div>
+</template>
+<script setup lang="ts">
+const emit = defineEmits<{
+  (e: "accepted"): void
+}>()
+</script>
+```
+
+该选项也可以接收一个对象，该对象允许开发者定义传入事件参数的验证器，和 `props` 定义里的验证器类似。
+
+### 4. expose选项(defineExpose)
+用于声明当组件实例被父组件通过模板引用访问时暴露的公共属性。
+当使用 expose 时，只有显式列出的属性将在组件实例上暴露。
+
+expose 仅影响用户定义的属性——它不会过滤掉内置的组件实例属性。
+```js
+export default {
+  // 只有 `publicMethod` 在公共实例上可用
+  expose: ['publicMethod'],
+  methods: {
+    publicMethod() {
+      // ...
+    },
+    privateMethod() {
+      // ...
+    }
+  }
+}
+```
+
+```vue
+// 组合式api
+<script setup lang="ts">
+const publicMethod = () => {}
+const privateMethod = () => {}
+
+defineExpose({
+  publicMethod
+})
+</script>
+```
+
+### 5. defineSlots
+
+这个宏可以用于为 IDE 提供插槽名称和 props 类型检查的类型提示。这个宏在简单的组件中几乎用不到，但对于一些复杂的组件非常有用，尤其是这个特性与泛型组件一起使用。或是在 Volar 无法正确地推测出类型时，我们可以手动指定。
+
+```vue
+<script setup lang="ts">
+// 我们手动定义了 default 组件的插槽作用域的类型。
+const slots = defineSlots<{
+  default(props: { foo: string; bar: number }): any
+}>()
+</script>
+```
+
+例子：
+
+```vue
+<script setup lang="ts" generic="T">
+// 子组件 Paginator
+defineProps<{
+  data: T[]
+}>()
+
+defineSlots<{
+  default(props: { item: T }): any
+}>()
+</script>
+```
+
+```vue
+<template>
+  <!-- 父组件 -->
+  <Paginator :data="[1, 2, 3]">
+    <template #default="{ item }">{{ item }}</template>
+  </Paginator>
+</template>
+```
+
+### 6. defineOptions
+
+这个宏可以用来直接在 `<script setup>` 中声明组件选项，而不必使用单独的 `<script>` 块
+
+在有 `<script setup>` 之前，如果要定义 `props`, `emits` 可以轻而易举地添加一个与 `setup` 平级的属性。
+
+```vue
+<script>
+export default {
+  name: "Protable"
+  props: {},
+  emits: [],
+  setup() {
+    return {}
+  }
+}
+</script>
+```
+
+ 但是用了 `<script setup>` 后，就没法这么干了—— `setup` 属性已经没有了，自然无法添加与其平级的属性。为了解决这一问题，vue引入了 `defineProps` 与 `defineEmits` 这两个宏。
+
+```vue
+<script setup lang="ts">
+const props = deifneProps()
+const emit = defineEmits()
+</script>
+```
+
+但这只解决了 `props` 与 `emits` 这两个属性。如果我们要定义组件的 `name`、 `inheritAttrs` 或其他自定义的属性，还是得回到最原始的用法——再添加一个普通的 `<script>` 标签。这样就会存在两个 `<script>` 标签。
+
+Vue 3.3 中新引入了 `defineOptions` 宏，主要是用来定义 Options API 的选项。我们可以用 `defineOptions` 定义任意的选项， `props`, `emits`, `expose`, `slots` 除外（因为这些可以使用 ```defineXXX``` 来做到）
+
+例子：
+
+```vue
+<script setup>
+defineOptions({
+  name: 'Protable',
+  inheritAttrs: false,
+  // ... 更多自定义属性
+})
+</script>
+```
+
+
+
+::: tip
+
+ 一个完整的使用defineXXX 的组件示例
+
+:::
+
+
+
+::: code-group
+
+```vue [ProTable.vue]
+<script setup lang="ts" generic="T extends number">
+import { onMounted } from 'vue'
+import type { TableProp } from '@/components/types'
+
+// 定义options
+defineOptions({
+  name: 'ProTable'
+})
+
+// 定义props
+const props = withDefaults(defineProps<TableProp<T>>(), { age: 18 })
+
+// 定义emits
+const emit = defineEmits<{
+  (e: 'update:modelValue', value: string): void
+}>()
+
+// 定义slots
+defineSlots<{
+  itemSlot(props: { item: T }): any
+}>()
+
+const publicMethod = () => console.log('method')
+
+// 定义expose
+defineExpose({
+  publicMethod
+})
+
+onMounted(() => console.log('onMounted'))
+</script>
+<template>
+  <div>123</div>
+  <slot name="itemSlot" :item="data[0]"></slot>
+</template>
+```
+
+```ts [types.ts]
+export interface TableProp<T = any> {
+  modelValue: string
+  data: T[]
+  name: string
+  age?: number
+}
+```
+
+:::
+
+
+
+### 7. Teleport组件
+
+`<Teleport> `是一个内置组件，它可以将一个组件内部的一部分模板“传送”到该组件的 DOM 结构外层的位置去。
+
+有以下场景：组件模板的一部分在逻辑上属于该组件，但从视图角度来看，它在 DOM 中应该被渲染在整个 Vue 应用外部的其他地方，例如弹窗。
+
+[示例](https://play.vuejs.org/#eNrVU01v2zAM/SusgCEtsMSpgx7iucGGXXYpdim2iy+ORTfCZEuQ5DRZkf8+SrLjrMuGoacWCGKRfPzQe9QT+6T1bNshy1huKyO0A4uu06uiFY1WxsETGKzhALVRDUwIOjmG7vZ3ipcyhgo2S3qHL1iw57D0D1w6AIu2Uq110NgHuPX9LidfUEoF35WR/GJyVbR5Esejwchw2GhZOiQLIOdiC5Usrb0tmOocmoKFAIU2i9W9UtIJbeFRuA186xAWcI8S/Wx5QoAeSlX6IxnD1ZIhmozhfG1G/7ms9EzacMqT4+zsPTshbFSAULgLzHGsy06SBr4CL115eRXPQCS5zrSDBaA0thnUpbQYXQf/oT/6/Yu7deecauFjJUX1w/NHdUgDZ7wyq6/eCiPmSUSGGj3n26mo+5SCHRVoPHxUQK+ilEF8t0EI8Ys88TsW6Tw/QrwLW32WyuJJ+7NchptZt5cItqICnDyz0ClSpJUVTihPkdgh/+B9P6ei5bjLYLlcBodTOoN0/i4YEmuXwU1vPQruNhks5nO9C46mNA+inUbU9Ppm8K+V4WgyuNY7sEoKTkr5dlEGP+CJ7uEBvHLh0+fKD2+H6KK0teL7Uez/3Yq/7kV6shgvWY3fn9ww6hvelcMv4ubajA==)
+
+当在初始 HTML 结构中使用这个组件时，会有一些潜在的问题：
+
+position: fixed 能够相对于浏览器窗口放置有一个条件，那就是不能有任何祖先元素设置了 transform、perspective 或者 filter 样式属性。也就是说如果我们想要用 CSS transform 为祖先节点` <div class="outer">`设置动画，就会不小心破坏模态框的布局
+
+这个模态框的 z-index 受限于它的容器元素。如果有其他元素与`<div class="outer">`重叠并有更高的 z-index，则它会覆盖住我们的模态框。
+
+
+
+### 8. css v-bind
+
+单文件组件的 `<style>` 标签支持使用 `v-bind` CSS 函数将 CSS 的值链接到动态的组件状态
+
+```vue
+<script setup>
+const theme = {
+  color: 'red'
+}
+const backGroundColor = "red"
+</script>
+
+<template>
+  <p>hello</p>
+</template>
+
+<style scoped>
+p {
+  color: v-bind('theme.color');
+  background-color: v-bind(backGroundColor)
+}
+</style>
+```
+
+实际的值会被编译成哈希化的 CSS 自定义属性，因此 CSS 本身仍然是静态的。自定义属性会通过内联样式的方式应用到组件的根元素上，并且在源值变更的时候响应式地更新。
+
+### 9. Suspense异步组件
+
+`<Suspense>` 是一个内置组件，用来在组件树中协调对异步依赖的处理。它让我们可以在组件树上层等待下层的多个嵌套异步依赖项解析完成，并可以在等待时渲染一个加载状态。
+
+```
+<Suspense>
+└─ <Dashboard>
+   ├─ <Profile>
+   │  └─ <FriendStatus>（组件有异步的 setup()）
+   └─ <Content>
+      ├─ <ActivityFeed> （异步组件）
+      └─ <Stats>（异步组件）
+```
+
+`<Suspense>` 可以等待的异步依赖有两种：
+
+1. 带有异步 `setup()` 钩子的组件（顶层await）
+
+   ```vue
+   // 1. script setup
+   <script setup lang="ts">
+   const result = await fetch()
+   </script>
+   ```
+
+   ```vue
+   // 2. setup
+   <script lang="ts">
+   export default {
+     async setup() {
+       const result = await fetch()
+       return { result }
+     }
+   }
+   </script>
+   ```
+
+2. 异步组件
+
+   ```js
+   import { defineAsyncComponent } from 'vue'
+   
+   const AsyncComp = defineAsyncComponent(() => {
+     return new Promise((resolve, reject) => {
+       // ...从服务器获取组件
+       resolve(/* 获取到的组件 */)
+     })
+   })
+   // ... 像使用其他一般组件一样使用 `AsyncComp`
+   ```
+
+   ```js
+   import { defineAsyncComponent } from 'vue'
+   
+   const AsyncComp = defineAsyncComponent(() =>
+     import('./components/MyComponent.vue')
+   )
+   ```
+
+**Suspense插槽**
+
+```vue
+<Suspense>
+  <!-- 具有深层异步依赖的组件 -->
+  <Dashboard />
+
+  <!-- 在 #fallback 插槽中显示 “正在加载中” -->
+  <template #fallback>
+    Loading...
+  </template>
+</Suspense>
+```
+
+**Suspense事件**
+
+1. pendding
+
+   在进入挂起状态时触发
+
+2. resolve
+
+   在 `default` 插槽完成获取新内容时触发
+
+3. fallback
+
+   在 `fallback` 插槽的内容显示时触发
+
+在初始渲染时，`<Suspense>` 将在内存中渲染其默认的插槽内容。如果在这个过程中遇到任何异步依赖，则会进入**挂起**状态。在挂起状态期间，展示的是fallback内容。当所有遇到的异步依赖都完成后，`<Suspense>` 会进入**完成**状态，并将展示出默认插槽的内容。
+
+
+
 ## 非兼容性变更
+
 ### 1. v-model
 
 - **非兼容**：用于自定义组件时，`v-model` prop 和事件默认名称已更改：
@@ -585,12 +1018,12 @@ Vue 本身就是用 TypeScript 编写的，并对 TypeScript 提供了一等公�
    在 2.x 中，`render` 函数会自动接收 `h` 函数 (它是 `createElement` 的惯用别名) 作为参数：
 
    ```js
-   // Vue 2 渲染函数示例
-   export default {
-     render(h) {
-       return h('div')
-     }
-   }
+// Vue 2 渲染函数示例
+export default {
+  render(h) {
+    return h('div')
+  }
+}
    ```
 
    **3.x 语法**
@@ -598,14 +1031,14 @@ Vue 本身就是用 TypeScript 编写的，并对 TypeScript 提供了一等公�
    在 3.x 中，`h` 函数现在是全局导入的，而不是作为参数自动传递。
 
    ```js
-   // Vue 3 渲染函数示例
-   import { h } from 'vue'
-   
-   export default {
-     render() {
-       return h('div')
-     }
-   }
+// Vue 3 渲染函数示例
+import { h } from 'vue'
+
+export default {
+  render() {
+    return h('div')
+  }
+}
    ```
 
    #### 注册组件
@@ -615,25 +1048,25 @@ Vue 本身就是用 TypeScript 编写的，并对 TypeScript 提供了一等公�
    在 2.x 中，注册一个组件后，把组件名作为字符串传递给渲染函数的第一个参数，它可以正常地工作：
 
    ```jsx
-   // 2.x
-   Vue.component('button-counter', {
-     data() {
-       return {
-         count: 0
-       }
-     },
-     template: `
-       <button @click="count++">
-         Clicked {{ count }} times.
-       </button>
-     `
-   })
-   
-   export default {
-     render(h) {
-       return h('button-counter')
-     }
-   }
+// 2.x
+Vue.component('button-counter', {
+  data() {
+    return {
+      count: 0
+    }
+  },
+  template: `
+    <button @click="count++">
+      Clicked {{ count }} times.
+    </button>
+  `
+})
+
+export default {
+  render(h) {
+    return h('button-counter')
+  }
+}
    ```
 
    **3.x 语法**
@@ -641,15 +1074,15 @@ Vue 本身就是用 TypeScript 编写的，并对 TypeScript 提供了一等公�
    在 3.x 中，由于 VNode 是上下文无关的，不能再用字符串 ID 隐式查找已注册组件。取而代之的是，需要使用一个导入的 `resolveComponent` 方法：
 
    ```js
-   // 3.x
-   import { h, resolveComponent } from 'vue'
-   
-   export default {
-     setup() {
-       const ButtonCounter = resolveComponent('button-counter')
-       return () => h(ButtonCounter)
-     }
-   }
+// 3.x
+import { h, resolveComponent } from 'vue'
+
+export default {
+  setup() {
+    const ButtonCounter = resolveComponent('button-counter')
+    return () => h(ButtonCounter)
+  }
+}
    ```
 
 ### 7. 移除 `$listeners` 
@@ -825,327 +1258,6 @@ const CompA = {
 ### 14. 侦听数组
 
 - **非兼容**: 当侦听一个数组时，只有当数组被替换时才会触发回调。如果你需要在数组被改变时触发回调，必须指定 `deep` 选项。
-
-## 新增概念
-
-### 1. defineProps
-
-setup语法糖中定义props
-
-```vue
-<script setup lang="ts">
-const props = defineProps<{
-  name: string
-  age: number
-}>()
-</script>
-```
-
-
-
-### 2. emits选项(defineEmits)
-
-Vue 3 现在提供一个 `emits` 选项，和现有的 `props` 选项类似。这个选项可以用来定义一个组件可以向其父组件触发的事件。
-
-**2.x 的行为**
-
-在 Vue 2 中，你可以定义一个组件可接收的 prop，但是你无法声明它可以触发哪些事件：
-
-```vue
-<template>
-  <div>
-    <p>{{ text }}</p>
-    <button v-on:click="$emit('accepted')">OK</button>
-  </div>
-</template>
-<script>
-  export default {
-    props: ['text']
-  }
-</script>
-```
-
-**3.x 的行为**
-
-和 prop 类似，现在可以通过 `emits` 选项来定义组件可触发的事件：
-
-```vue
-<template>
-  <div>
-    <p>{{ text }}</p>
-    <button v-on:click="$emit('accepted')">OK</button>
-  </div>
-</template>
-<script>
-  export default {
-    props: ['text'],
-    emits: ['accepted']
-  }
-</script>
-```
-
-```vue
-// 组合式api
-<template>
-  <div>
-    <p>{{ text }}</p>
-    <button v-on:click="emit('accepted')">OK</button>
-  </div>
-</template>
-<script setup lang="ts">
-const emit = defineEmits<{
-  (e: "accepted"): void
-}>()
-</script>
-```
-
-该选项也可以接收一个对象，该对象允许开发者定义传入事件参数的验证器，和 `props` 定义里的验证器类似。
-
-### 3. expose选项(defineExpose)
-用于声明当组件实例被父组件通过模板引用访问时暴露的公共属性。
-当使用 expose 时，只有显式列出的属性将在组件实例上暴露。
-
-expose 仅影响用户定义的属性——它不会过滤掉内置的组件实例属性。
-```js
-export default {
-  // 只有 `publicMethod` 在公共实例上可用
-  expose: ['publicMethod'],
-  methods: {
-    publicMethod() {
-      // ...
-    },
-    privateMethod() {
-      // ...
-    }
-  }
-}
-```
-
-```vue
-// 组合式api
-<script setup lang="ts">
-const publicMethod = () => {}
-const privateMethod = () => {}
-
-defineExpose({
-  publicMethod
-})
-</script>
-```
-
-### 4. defineSlots
-
-这个宏可以用于为 IDE 提供插槽名称和 props 类型检查的类型提示。这个宏在简单的组件中几乎用不到，但对于一些复杂的组件非常有用，尤其是这个特性与泛型组件一起使用。或是在 Volar 无法正确地推测出类型时，我们可以手动指定。
-
-```vue
-<script setup lang="ts">
-// 我们手动定义了 default 组件的插槽作用域的类型。
-const slots = defineSlots<{
-  default(props: { foo: string; bar: number }): any
-}>()
-</script>
-```
-
-例子：
-
-```vue
-<script setup lang="ts" generic="T">
-// 子组件 Paginator
-defineProps<{
-  data: T[]
-}>()
-
-defineSlots<{
-  default(props: { item: T }): any
-}>()
-</script>
-```
-
-```vue
-<template>
-  <!-- 父组件 -->
-  <Paginator :data="[1, 2, 3]">
-    <template #default="{ item }">{{ item }}</template>
-  </Paginator>
-</template>
-```
-
-### 5. defineOptions
-
-这个宏可以用来直接在 `<script setup>` 中声明组件选项，而不必使用单独的 `<script>` 块
-
-在有 `<script setup>` 之前，如果要定义 `props`, `emits` 可以轻而易举地添加一个与 `setup` 平级的属性。
-
-```vue
-<script>
-export default {
-  name: "Protable"
-  props: {},
-  emits: [],
-  setup() {
-    return {}
-  }
-}
-</script>
-```
-
- 但是用了 `<script setup>` 后，就没法这么干了—— `setup` 属性已经没有了，自然无法添加与其平级的属性。为了解决这一问题，vue引入了 `defineProps` 与 `defineEmits` 这两个宏。
-
-```vue
-<script setup lang="ts">
-const props = deifneProps()
-const emit = defineEmits()
-</script>
-```
-
-但这只解决了 `props` 与 `emits` 这两个属性。如果我们要定义组件的 `name`、 `inheritAttrs` 或其他自定义的属性，还是得回到最原始的用法——再添加一个普通的 `<script>` 标签。这样就会存在两个 `<script>` 标签。
-
-Vue 3.3 中新引入了 `defineOptions` 宏，主要是用来定义 Options API 的选项。我们可以用 `defineOptions` 定义任意的选项， `props`, `emits`, `expose`, `slots` 除外（因为这些可以使用 ```defineXXX``` 来做到）
-
-例子：
-
-```vue
-<script setup>
-defineOptions({
-  name: 'Protable',
-  inheritAttrs: false,
-  // ... 更多自定义属性
-})
-</script>
-```
-
-### 6. Teleport组件
-
-`<Teleport> `是一个内置组件，它可以将一个组件内部的一部分模板“传送”到该组件的 DOM 结构外层的位置去。
-
-有以下场景：组件模板的一部分在逻辑上属于该组件，但从视图角度来看，它在 DOM 中应该被渲染在整个 Vue 应用外部的其他地方，例如弹窗。
-
-[示例](https://play.vuejs.org/#eNrVU01v2zAM/SusgCEtsMSpgx7iucGGXXYpdim2iy+ORTfCZEuQ5DRZkf8+SrLjrMuGoacWCGKRfPzQe9QT+6T1bNshy1huKyO0A4uu06uiFY1WxsETGKzhALVRDUwIOjmG7vZ3ipcyhgo2S3qHL1iw57D0D1w6AIu2Uq110NgHuPX9LidfUEoF35WR/GJyVbR5Esejwchw2GhZOiQLIOdiC5Usrb0tmOocmoKFAIU2i9W9UtIJbeFRuA186xAWcI8S/Wx5QoAeSlX6IxnD1ZIhmozhfG1G/7ms9EzacMqT4+zsPTshbFSAULgLzHGsy06SBr4CL115eRXPQCS5zrSDBaA0thnUpbQYXQf/oT/6/Yu7deecauFjJUX1w/NHdUgDZ7wyq6/eCiPmSUSGGj3n26mo+5SCHRVoPHxUQK+ilEF8t0EI8Ys88TsW6Tw/QrwLW32WyuJJ+7NchptZt5cItqICnDyz0ClSpJUVTihPkdgh/+B9P6ei5bjLYLlcBodTOoN0/i4YEmuXwU1vPQruNhks5nO9C46mNA+inUbU9Ppm8K+V4WgyuNY7sEoKTkr5dlEGP+CJ7uEBvHLh0+fKD2+H6KK0teL7Uez/3Yq/7kV6shgvWY3fn9ww6hvelcMv4ubajA==)
-
-当在初始 HTML 结构中使用这个组件时，会有一些潜在的问题：
-
-position: fixed 能够相对于浏览器窗口放置有一个条件，那就是不能有任何祖先元素设置了 transform、perspective 或者 filter 样式属性。也就是说如果我们想要用 CSS transform 为祖先节点` <div class="outer">`设置动画，就会不小心破坏模态框的布局
-
-这个模态框的 z-index 受限于它的容器元素。如果有其他元素与`<div class="outer">`重叠并有更高的 z-index，则它会覆盖住我们的模态框。
-
-
-
-### 7. css v-bind
-
-单文件组件的 `<style>` 标签支持使用 `v-bind` CSS 函数将 CSS 的值链接到动态的组件状态
-
-```vue
-<script setup>
-const theme = {
-  color: 'red'
-}
-const backGroundColor = "red"
-</script>
-
-<template>
-  <p>hello</p>
-</template>
-
-<style scoped>
-p {
-  color: v-bind('theme.color');
-  background-color: v-bind(backGroundColor)
-}
-</style>
-```
-
-实际的值会被编译成哈希化的 CSS 自定义属性，因此 CSS 本身仍然是静态的。自定义属性会通过内联样式的方式应用到组件的根元素上，并且在源值变更的时候响应式地更新。
-
-### 8. Suspense异步组件
-
-`<Suspense>` 是一个内置组件，用来在组件树中协调对异步依赖的处理。它让我们可以在组件树上层等待下层的多个嵌套异步依赖项解析完成，并可以在等待时渲染一个加载状态。
-
-```
-<Suspense>
-└─ <Dashboard>
-   ├─ <Profile>
-   │  └─ <FriendStatus>（组件有异步的 setup()）
-   └─ <Content>
-      ├─ <ActivityFeed> （异步组件）
-      └─ <Stats>（异步组件）
-```
-
-`<Suspense>` 可以等待的异步依赖有两种：
-
-1. 带有异步 `setup()` 钩子的组件（顶层await）
-
-   ```vue
-   // 1. script setup
-   <script setup lang="ts">
-   const result = await fetch()
-   </script>
-   ```
-
-   ```vue
-   // 2. setup
-   <script lang="ts">
-   export default {
-     async setup() {
-       const result = await fetch()
-       return { result }
-     }
-   }
-   </script>
-   ```
-
-2. 异步组件
-
-   ```js
-   import { defineAsyncComponent } from 'vue'
-   
-   const AsyncComp = defineAsyncComponent(() => {
-     return new Promise((resolve, reject) => {
-       // ...从服务器获取组件
-       resolve(/* 获取到的组件 */)
-     })
-   })
-   // ... 像使用其他一般组件一样使用 `AsyncComp`
-   ```
-
-   ```js
-   import { defineAsyncComponent } from 'vue'
-   
-   const AsyncComp = defineAsyncComponent(() =>
-     import('./components/MyComponent.vue')
-   )
-   ```
-
-**Suspense插槽**
-
-```vue
-<Suspense>
-  <!-- 具有深层异步依赖的组件 -->
-  <Dashboard />
-
-  <!-- 在 #fallback 插槽中显示 “正在加载中” -->
-  <template #fallback>
-    Loading...
-  </template>
-</Suspense>
-```
-
-**Suspense事件**
-
-1. pendding
-
-   在进入挂起状态时触发
-
-2. resolve
-
-   在 `default` 插槽完成获取新内容时触发
-
-3. fallback
-
-   在 `fallback` 插槽的内容显示时触发
-
-在初始渲染时，`<Suspense>` 将在内存中渲染其默认的插槽内容。如果在这个过程中遇到任何异步依赖，则会进入**挂起**状态。在挂起状态期间，展示的是fallback内容。当所有遇到的异步依赖都完成后，`<Suspense>` 会进入**完成**状态，并将展示出默认插槽的内容。
-
-
 
 ## 目前遇到的一些限制/注意点
 
