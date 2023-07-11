@@ -4,6 +4,7 @@ export interface Blog {
   category: string
   tags: string[]
   link: string
+  isHiddenAtIndex?: boolean
 }
 
 export interface Page {

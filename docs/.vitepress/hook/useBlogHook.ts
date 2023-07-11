@@ -3,7 +3,7 @@ import {Blog, Page} from "../types/blog"
 import {ref, watchEffect} from "vue"
 import {splitToPage} from "../utils/page"
 export const useBlogHook = (pagination: Page) => {
-  const allBlogList: Blog[] = list
+  const allBlogList: Blog[] = list.filter((item) => !item?.isHiddenAtIndex)
   allBlogList.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
 
   const categories = new Set()
