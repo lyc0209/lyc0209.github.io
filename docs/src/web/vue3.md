@@ -247,6 +247,51 @@ onMounted(() => {
    </script>
    ```
 
+   
+
+   监听鼠标移动
+
+   ```js
+   // useMouseHook
+   import { ref, onMounted, onUnmounted } from 'vue';
+   
+   export const useMouseHook = () => {
+     const x = ref(0)
+     const y = ref(0)
+   
+     const updateMousePosition = (event) => {
+       x.value = event.pageX;
+       y.value = event.pageY;
+     };
+   
+     onMounted(() => {
+       window.addEventListener('mousemove', updateMousePosition)
+     });
+   
+     onUnmounted(() => {
+       window.removeEventListener('mousemove', updateMousePosition)
+     })
+   
+     return { x, y }
+   }
+   ```
+
+   ```vue
+   <template>
+     <div>
+       <p>Mouse X: {{ x }}</p>
+       <p>Mouse Y: {{ y }}</p>
+     </div>
+   </template>
+   
+   <script setup>
+   import { useMouseHook } from './useMouseHook'
+   const { x, y } = useMouseHook()
+   </script>
+   ```
+
+   
+
 2. **更灵活的代码组织**
 
    ![](https://cdn.jsdelivr.net/gh/lyc0209/pic/blog/202305091033284.png)
