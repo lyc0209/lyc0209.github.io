@@ -1366,4 +1366,31 @@ export default {
 
    ![](https://cdn.jsdelivr.net/gh/lyc0209/pic/blog/202307111525608.png)
 
-总结：**在最新版vue中：defineXXX可以引用import导入的内容、setup中基本常量，不可引用局部变量**
+总结：**在最新版vue中：defineXXX可以引用import导入的内容、setup中基本常量。不可引用局部变量**
+
+
+
+### 3. Transition组件仅支持单个子节点
+
+vue3的组件支持多个根节点，下面的代码是可行的：
+
+```vue
+<!--ProTable.vue-->
+<template>
+  <div>123</div>
+  <div>456</div>
+</template>
+```
+
+但是结合`Transition`动画组件使用时，需要注意下，`<Transition>` 仅支持单个元素或组件作为其插槽内容。如果内容是一个组件，这个组件必须仅有一个根元素。
+
+[示例](https://play.vuejs.org/#eNp9U0ty2zAMvQrKbpKZxErs9KfI7ieTRbtoO22W2jAUJDGmSA1JOe54vG43vUTv1p6joGRJTibJjsB7eACeoA17X9eTVYMsZokTVtYeHPqmXqRaVrWxHjZgMYct5NZUkDLipmwAL0xVn/bQJGrDIHePMr1LmfaUVAujnQdRcl1ggGAe2h3kXDk87GGjL5QUS8IODmG+2KNPVlw1SMCz+7kgnkTdSrQMBR6rWnGPFAEk1433RsM7EZTnKdv1SNni76+f/37/SaKO0bEzuQLnfygk5jUXy8KaRmfHwihjY3iOiOdwKzNfxnB2clKvz6FEWZQ+hmkISTXIkNCV5dpJL6m15lWQy3lGXkBlshCZxh9LPfCpQtBKRqP2EEtHjD2v3u78jzuTqSqJBnrfMRpbdrtEtAy9kmgwhB0x78jqXBaTG2c0HcMmUKkZqUmF9ksd6l3KYmiRgHGlzO2nNudtg0d9XpQolg/kbxz5ENPjq0WHdkVbD5jntkDfwZffP+Oa3gNI1jSK2E+A39AZ1YQZO9oH+jo09h6vnfZje5JSF1fucu2RbNktFQYNzG3Lb688WPrY6uO4s8msrUv1llwc7j/8TuO92f6GFqfT2c7/MXf24uWYu/tVhp/lMb1Xr988XLv9D9V7SPg=)
+
+```vue
+<Transition name="fade" mode="out-in">
+  <component :is="activeComponent"></component>
+</Transition>
+```
+
+
+
