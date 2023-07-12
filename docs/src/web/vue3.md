@@ -899,41 +899,9 @@ p {
 
 ### 2. key
 
-在 Vue 2.x 中，`<template>` 标签不能拥有 `key`。不过，你可以为其每个子节点分别设置 `key`。
-
-```vue
-<!-- Vue 2.x -->
-<template v-for="item in list">
-  <div :key="'heading-' + item.id">...</div>
-  <span :key="'content-' + item.id">...</span>
-</template>
-```
-
-在 Vue 3.x 中，`key` 则应该被设置在 `<template>` 标签上。
-
-```vue
-<!-- Vue 3.x -->
-<template v-for="item in list" :key="item.id">
-  <div>...</div>
-  <span>...</span>
-</template>
-```
-
-类似地，当使用 `<template v-for>` 时如果存在使用 `v-if` 的子节点，则 `key` 应改为设置在 `<template>` 标签上。
-
-```vue
-<!-- Vue 2.x -->
-<template v-for="item in list">
-  <div v-if="item.isVisible" :key="item.id">...</div>
-  <span v-else :key="item.id">...</span>
-</template>
-
-<!-- Vue 3.x -->
-<template v-for="item in list" :key="item.id">
-  <div v-if="item.isVisible">...</div>
-  <span v-else>...</span>
-</template>
-```
+- **新增**：对于`v-if`/`v-else`/`v-else-if`的各分支项 `key` 将不再是必须的，因为现在 Vue 会自动生成唯一的 `key`。
+  - **非兼容**：如果你手动提供 `key`，那么每个分支必须使用唯一的 `key`。你将不再能通过故意使用相同的 `key` 来强制重用分支。
+- **非兼容**：`<template v-for>` 的 `key` 应该设置在 `<template>` 标签上 (而不是设置在它的子节点上)。
 
 ### 3. v-if 与v-for的优先级
 
@@ -1200,6 +1168,33 @@ export default {
 无法通过通过Vue示例创建事件总线
 
 ### 11. 移除过滤器
+
+例如：
+
+```vue
+<template>
+  <h1>Bank Account Balance</h1>
+  <p>{{ accountBalance | currencyUSD }}</p>
+</template>
+
+<script>
+  export default {
+    props: {
+      accountBalance: {
+        type: Number,
+        required: true
+      }
+    },
+    filters: {
+      currencyUSD(value) {
+        return '$' + value
+      }
+    }
+  }
+</script>
+```
+
+虽然这看起来很方便，但它需要一个自定义语法，打破了大括号内的表达式“只是 JavaScript”的假设，这不仅有学习成本，而且有实现成本。
 
 ### 12. 移除`$children`
 
