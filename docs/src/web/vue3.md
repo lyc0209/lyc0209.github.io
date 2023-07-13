@@ -18,7 +18,7 @@
 
 **[Proxy](https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/Proxy)** 对象用于创建一个对象的代理，从而实现基本操作的拦截和自定义（如属性查找、赋值、枚举、函数调用等）。
 
-
+[Proxy - ECMAScript 6入门](https://es6.ruanyifeng.com/#docs/proxy)
 
 Vue2实现响应式的原理是通过Object.defineProperty()，最大的问题是无法监听对象中属性增删、数组变化
 
