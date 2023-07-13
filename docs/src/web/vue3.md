@@ -234,16 +234,21 @@ onMounted(() => {
    // fetch.js
    import { ref } from 'vue'
    
-   export function useFetch(url) {
+   export function useFetch(url, isAutoFetch = true) {
      const data = ref(null)
      const error = ref(null)
    
-     fetch(url)
-       .then((res) => res.json())
-       .then((json) => (data.value = json))
-       .catch((err) => (error.value = err))
+     const fetchResult = () => {
+       fetch(url)
+         .then((res) => res.json())
+         .then((json) => (data.value = json))
+         .catch((err) => (error.value = err))
+     }
+     if (isAutoFetch) {
+       fetchResult()
+     }
    
-     return { data, error }
+     return { data, error, fetchResult }
    }
    ```
 
@@ -251,7 +256,7 @@ onMounted(() => {
    <script setup>
    import { useFetch } from './fetch.js'
    
-   const { data, error } = useFetch('...')
+   const { data, error, fetchResult } = useFetch('http://xxx.xxx')
    </script>
    ```
 
@@ -373,7 +378,7 @@ Vue 本身就是用 TypeScript 编写的，并对 TypeScript 提供了一等公�
       }
       ```
 
-      ```js [有状态提升]
+      ```js [有静态提升]
       // 把静态节点提升到渲染函数之外
       const hoist1 = createVNode('p', null, 'text')
       
