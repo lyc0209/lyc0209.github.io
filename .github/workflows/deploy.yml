@@ -20,9 +20,14 @@ jobs:
       - uses: actions/setup-node@v3
         with:
           node-version: 18
-          cache: npm
-      - name: Install
-        run: npm ci
+      - uses: pnpm/action-setup@v2
+        name: Install pnpm
+        with:
+          version: 8
+          run_install: false
+
+      - name: Install dependencies
+        run: pnpm install
       - name: Generate
         run: node ./docs/generate.mjs
       - name: Build
