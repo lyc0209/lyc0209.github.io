@@ -19,7 +19,7 @@ jobs:
           fetch-depth: 0
       - uses: actions/setup-node@v3
         with:
-          node-version: 18
+          node-version: 20
       - uses: pnpm/action-setup@v2
         name: Install pnpm
         with:
@@ -29,7 +29,7 @@ jobs:
       - name: Install dependencies
         run: pnpm install
       - name: Generate
-        run: node ./docs/generate.mjs
+        run: node ./docs/generate.js
       - name: Build
         run: npm run docs:build
       - uses: actions/configure-pages@v2
