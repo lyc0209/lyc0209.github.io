@@ -11,9 +11,9 @@
   "author": "",
   "license": "ISC",
   "devDependencies": {
-    "@types/node": "18.15.0",
+    "@types/node": "20.10.0",
     "fs-extra": "^11.1.1",
     "sass": "^1.62.1",
-    "vitepress": "^1.0.0-alpha.75"
+    "vitepress": "^1.0.0-rc.39"
   }
 }
