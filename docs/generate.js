@@ -17,6 +17,9 @@ const generate = async (dirPath) => {
       if (s) {
         console.log(s[1], tempPath)
         const result = JSON.parse(s[1])
+        if (result?.isHideIndex) {
+          return
+        }
         result.link = tempPath.slice(8, -3).replaceAll("\\", "/")
         out.push(result)
       }
